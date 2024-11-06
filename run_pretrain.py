@@ -10,8 +10,16 @@ from ifstatement.model import *
 
 
 def one_time_run_pretrain():
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Using device: {device}")
+    gpu_id = 2
+
+    # Check if CUDA (GPU) is available and set the device accordingly
+    if torch.cuda.is_available():
+        device = torch.device(f"cuda:{gpu_id}")
+        print(f"Using GPU: {torch.cuda.get_device_name(gpu_id)} (ID: {gpu_id})")
+        print(f"Memory available: {torch.cuda.get_device_properties(gpu_id).total_memory / 1e9:.2f} GB")
+    else:
+        device = torch.device("cpu")
+        print("CUDA is not available. Using CPU.")
 
     with open("src/full_dataset.pkl", "rb") as file:
         loaded_data = pickle.load(file)
