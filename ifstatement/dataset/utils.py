@@ -6,86 +6,86 @@ import tokenize
 from io import StringIO
 
 
-def remove_comments(input_string):
-    pass
+# def remove_comments(input_string):
+#     pass
 
 
-def tokenize_code(input_str: str) -> str:
-    """
-    Tokenizes a Python function into a format with <TAB> markers for indentation and spaces
-    between terms.
-
-    Args:
-        input_str (str): The Python code as a single string.
-
-    Returns:
-        str: Tokenized code with <TAB> markers and spaces between terms.
-    """
-    result = []
-    indentation_level = 0
-
-    # Use StringIO to convert the string to a readable stream for tokenize
-    tokens = tokenize.generate_tokens(StringIO(input_str).readline)
-
-    for token in tokens:
-        tok_type = token.type
-        tok_string = token.string
-
-        if tok_type == tokenize.INDENT:
-            indentation_level += 1
-        elif tok_type == tokenize.DEDENT:
-            indentation_level -= 1
-        elif tok_type == tokenize.NEWLINE or tok_type == tokenize.NL:
-            # Add newline with appropriate indentation level
-            result.append("<TAB> " * indentation_level)
-        elif tok_type == tokenize.COMMENT:
-            continue  # Skip comments
-        else:
-            # For operators and punctuation, ensure spaces around symbols
-            if tok_string in {',', ':', '(', ')', '[', ']', '{', '}', '=', '+', '-', '*', '/', '%', '.', '==', '!=',
-                              '<', '>', '<=', '>='}:
-                result.append(f" {tok_string} ")
-            else:
-                result.append(tok_string)
-
-    # Join and reformat to remove unnecessary spaces
-    tokenized_code = " ".join(result).replace("  ", " ").strip()
-
-    # Convert multiple consecutive <TAB> lines into a single <TAB> per indentation level
-    # tokenized_code = tokenized_code.replace(" <TAB> ", "<TAB>").replace("<TAB><TAB>", "<TAB>")
-
-    return tokenized_code
+# def tokenize_code(input_str: str) -> str:
+#     """
+#     Tokenizes a Python function into a format with <TAB> markers for indentation and spaces
+#     between terms.
+#
+#     Args:
+#         input_str (str): The Python code as a single string.
+#
+#     Returns:
+#         str: Tokenized code with <TAB> markers and spaces between terms.
+#     """
+#     result = []
+#     indentation_level = 0
+#
+#     # Use StringIO to convert the string to a readable stream for tokenize
+#     tokens = tokenize.generate_tokens(StringIO(input_str).readline)
+#
+#     for token in tokens:
+#         tok_type = token.type
+#         tok_string = token.string
+#
+#         if tok_type == tokenize.INDENT:
+#             indentation_level += 1
+#         elif tok_type == tokenize.DEDENT:
+#             indentation_level -= 1
+#         elif tok_type == tokenize.NEWLINE or tok_type == tokenize.NL:
+#             # Add newline with appropriate indentation level
+#             result.append("<TAB> " * indentation_level)
+#         elif tok_type == tokenize.COMMENT:
+#             continue  # Skip comments
+#         else:
+#             # For operators and punctuation, ensure spaces around symbols
+#             if tok_string in {',', ':', '(', ')', '[', ']', '{', '}', '=', '+', '-', '*', '/', '%', '.', '==', '!=',
+#                               '<', '>', '<=', '>='}:
+#                 result.append(f" {tok_string} ")
+#             else:
+#                 result.append(tok_string)
+#
+#     # Join and reformat to remove unnecessary spaces
+#     tokenized_code = " ".join(result).replace("  ", " ").strip()
+#
+#     # Convert multiple consecutive <TAB> lines into a single <TAB> per indentation level
+#     # tokenized_code = tokenized_code.replace(" <TAB> ", "<TAB>").replace("<TAB><TAB>", "<TAB>")
+#
+#     return tokenized_code
 
 
 def count_token(tokenized_code: str) -> int:
     return len(tokenized_code.split())
 
 
-def remove_comment(input_string: str) -> str:
-    """
-    Removes all comment blocks and inline comments from a Python function string.
-
-    Args:
-        input_string (str): The Python function as a string with comments and __NEW_LINE__ as newline markers.
-
-    Returns:
-        str: The function string with comments removed, with __NEW_LINE__ as line breaks.
-    """
-    # Replace __NEW_LINE__ with actual newlines for processing
-    input_string = input_string.replace('__NEW_LINE__', '\n')
-
-    # Remove multi-line comments ("""...""" or '''...''')
-    input_string = re.sub(r'"""(.*?)"""', '', input_string, flags=re.DOTALL)
-    input_string = re.sub(r"'''(.*?)'''", '', input_string, flags=re.DOTALL)
-
-    # Remove single-line comments starting with #
-    input_string = re.sub(r'#.*', '', input_string)
-
-    # Remove any excess whitespace or empty lines resulting from comment removal
-    input_string = re.sub(r'\n\s*\n', '\n', input_string)
-
-    # Replace newlines back to __NEW_LINE__
-    return input_string.replace('\n', '__NEW_LINE__')
+# def remove_comment(input_string: str) -> str:
+#     """
+#     Removes all comment blocks and inline comments from a Python function string.
+#
+#     Args:
+#         input_string (str): The Python function as a string with comments and __NEW_LINE__ as newline markers.
+#
+#     Returns:
+#         str: The function string with comments removed, with __NEW_LINE__ as line breaks.
+#     """
+#     # Replace __NEW_LINE__ with actual newlines for processing
+#     input_string = input_string.replace('__NEW_LINE__', '\n')
+#
+#     # Remove multi-line comments ("""...""" or '''...''')
+#     input_string = re.sub(r'"""(.*?)"""', '', input_string, flags=re.DOTALL)
+#     input_string = re.sub(r"'''(.*?)'''", '', input_string, flags=re.DOTALL)
+#
+#     # Remove single-line comments starting with #
+#     input_string = re.sub(r'#.*', '', input_string)
+#
+#     # Remove any excess whitespace or empty lines resulting from comment removal
+#     input_string = re.sub(r'\n\s*\n', '\n', input_string)
+#
+#     # Replace newlines back to __NEW_LINE__
+#     return input_string.replace('\n', '__NEW_LINE__')
 
 
 
