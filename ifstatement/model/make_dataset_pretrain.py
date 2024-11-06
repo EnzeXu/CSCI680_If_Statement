@@ -20,7 +20,7 @@ input_texts = df['input_method_all'].tolist()
 # Step 2: Load the pre-trained tokenizer and model
 # tokenizer = AutoTokenizer.from_pretrained("Salesforce/codet5p-220m")  # Load CodeT5+ tokenizer
 # model = AutoModelForSeq2SeqLM.from_pretrained("Salesforce/codet5p-220m")
-T5CODE_TOKENIZER = RobertaTokenizer.from_pretrained('Salesforce/codet5-base')
+# T5CODE_TOKENIZER = RobertaTokenizer.from_pretrained('Salesforce/codet5-base')
 # T5CODE_MODEL = T5ForConditionalGeneration.from_pretrained('Salesforce/codet5-base')
 KEYWORDS = ["if", "elif", "else", "for", "while", "try", "except", "with", "def", "return", "raise"]
 random.seed(0)
@@ -149,7 +149,7 @@ print(f"std: {np.std(np.asarray(length_list))}")
 print(f"avg: {sum(length_list) / len(length_list)}")
 
 # Save as a pickle file
-save_path = "src/full_dataset.pkl"
+save_path = "src/full_dataset_pretrain.pkl"
 with open(save_path, "wb") as file:
     pickle.dump(data_to_save, file)
 

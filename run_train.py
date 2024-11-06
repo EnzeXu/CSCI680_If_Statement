@@ -1,12 +1,32 @@
 import os.path
 import pickle
 import torch
+import pandas as pd
 import torch.nn as nn
 from transformers import RobertaTokenizer, T5ForConditionalGeneration, AdamW, get_linear_schedule_with_warmup
 from torch.utils.data import Dataset, DataLoader, random_split
 
 
 from ifstatement.model import *
+
+
+def save_dataset_to_csv(one_dataset, save_path):
+    target_block_list = []
+    input_method_list = []
+    data_loader = DataLoader(one_dataset, batch_size=1, shuffle=True)
+    for batch in data_loader:
+        _, _, x, y = batch
+        x = x[0]
+        y = [item[0] for item in y]
+        # print(f"x: {x}")
+        # print(f"y: {y}")
+        input_method_list.append(x)
+        target_block_list.append(" ".join(y))
+    df = pd.DataFrame(columns=["id", "input_method", "target_block"])
+    df["input_method"] = input_method_list
+    df["target_block"] = target_block_list
+    df['id'] = range(len(df))
+    df.to_csv(save_path, index=False)
 
 
 def one_time_run_pretrain():
@@ -21,13 +41,13 @@ def one_time_run_pretrain():
         device = torch.device("cpu")
         print("CUDA is not available. Using CPU.")
 
-    with open("src/full_dataset_pretrain.pkl", "rb") as file:
+    with open("src/full_dataset_train.pkl", "rb") as file:
         loaded_data = pickle.load(file)
 
     test_cut = 1000
 
-    masked_text_list = loaded_data["X"][:test_cut]
-    ground_truth_tokens_list = loaded_data["Y"][:test_cut]
+    masked_text_list = loaded_data["X"]#[test_cut:2*test_cut]
+    ground_truth_tokens_list = loaded_data["Y"]#[test_cut:2*test_cut]
 
     # print(f"Example masked_text_list[0]: {masked_text_list[0]}")
     # print(f"Example ground_truth_tokens_list[0]: {ground_truth_tokens_list[0]}")
@@ -41,6 +61,7 @@ def one_time_run_pretrain():
     print(f"Data Size [train/val/test]: {train_size}/{val_size}/{test_size}")
 
     train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
+    save_dataset_to_csv(test_dataset, "result/test_dataset.csv")
 
 
     batch_size = 16
@@ -52,15 +73,15 @@ def one_time_run_pretrain():
 
     # Initialize the model and run training
     predictor = MaskPredictorModel().to(device)
-    predictor.train_model(train_loader, epochs=100, lr=1e-2)
-
-    #save model:
-    weights = {
-        "state_dict": predictor.model.state_dict()
-    }
-    if not os.path.exists("save"):
-        os.makedirs("save")
-    torch.save(weights, os.path.join("save", "pretrain_last.pth"))
+    # predictor.train_model(train_loader, epochs=100, lr=1e-2)
+    #
+    # #save model:
+    # weights = {
+    #     "state_dict": predictor.model.state_dict()
+    # }
+    # if not os.path.exists("save"):
+    #     os.makedirs("save")
+    # torch.save(weights, os.path.join("save", "train_last.pth"))
 
 
 if __name__ == "__main__":

@@ -4,3 +4,5 @@ pytz
 transformers
 torch
 pandas
+sentencepiece
+protobuf

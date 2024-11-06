@@ -8,27 +8,43 @@ CSCI 680 AI for Software Engineering - If Statement
 2) Yi Lin (ylin13@wm.edu).
 ---
 
-### 2-page Report:
+### 3-page Report:
 [Assignment_Report_Enze_and_Yi.pdf](Assignment_Report_Enze_and_Yi.pdf)
+
+---
+
+### Result CSV Files:
+These files are all available on [[OneDrive]](https://wmedu-my.sharepoint.com/:f:/g/personal/exu03_wm_edu/EgkSjqpbkqBAj1lqMXTdnF8BC3cHu9BN2DfHlh1yZquhng?e=xd8Lsd)
+1) `provided-testset.csv`: The prediction result of `sample.csv`.
+
+2) `generated-testset.csv`: The prediction result of `test_dataset.csv`.
+---
+
+### Quick screenshot of `generated-testset.csv`.
+
+---
+
+### Quick Experimental Results
+
+| **Dataset**      | **Result Save File**      | **Dataset Size** | **Correct Ratio** | Score 1 - avg | Score 1 - std | Score 2 - avg | Score 2 - std     | Score Avg - avg    | Score Avg - std     |
+|------------------|---------------------------|------------------|--------------------|---------------|---------------|---------------|---------------|---------------|---------------|
+| sample.csv       | provided-testset.csv      | 30               | 26.67%                                 | 93.98         | 4.89          | 63.22         | 27.72   | 78.60  | 15.99   |
+| test_dataset.csv | generated-testset.csv     | 5,000            | 17.40%           | 92.88         | 5.94          | 60.22         | 27.73   | 76.55  | 15.96   |
 
 ---
 
 # Contents
 
-[//]: # ()
-[//]: # (* [1 Introduction]&#40;#1-introduction&#41;)
-
-[//]: # (* [2 Getting Started]&#40;#2-getting-started&#41;)
-
-[//]: # (  * [2.1 Preparations]&#40;#21-preparations&#41;)
-
-[//]: # (  * [2.2 Install Packages]&#40;#22-install-packages&#41;)
-
-[//]: # (  * [2.3 Run N-gram]&#40;#23-run-n-gram&#41;)
-
-[//]: # (* [3 Report]&#40;#3-report&#41;)
-
-[//]: # (* [4 Questions]&#40;#4-questions&#41;)
+* [1 Introduction](#1-introduction)
+* [2 Getting Started](#2-getting-started)
+  * [2.1 Preparations](#21-preparations)
+  * [2.2 Install Packages](#22-install-packages)
+  * [2.3 Dataset and Data Preprocessing](#23-dataset-and-data-preprocessing)
+  * [2.4 Run Pretraining](#24-run-pretraining)
+  * [2.5 Run training](#25-run-training)
+  * [2.5 Evaluate a CSV File Using the Trained Model Weight](#26-evaluate-a-csv-file-using-the-trained-model-weight)
+* [3 Report](#3-report)
+* [4 Questions](#4-questions)
 
 [//]: # ()
 [//]: # (---)
@@ -39,165 +55,152 @@ CSCI 680 AI for Software Engineering - If Statement
 [//]: # ()
 [//]: # (---)
 
-[//]: # ()
-[//]: # (# 1. Introduction)
 
-[//]: # (Code completion in Java aims to automatically complete the code for Java methods or classes. The N-gram is a language model that can predict the next token in a sequence by learning the probabilities of token sequences based on their occurrences in the training data and choosing the token with the highest probability to follow.)
+# 1. Introduction
 
-[//]: # ()
-[//]: # ()
-[//]: # (# 2. Getting Started)
+Training a Transformer model for Predicting if statements.
 
-[//]: # ()
-[//]: # (This project is developed using Python 3.9+ and is compatible with macOS or Linux)
+Your initial objective is creating two training datasets (i.e., pre-training and fine-tuning) required to train a Transformer model capable of automatically recommending suitable if statements in Python functions.
 
-[//]: # ()
-[//]: # (## 2.1 Preparations)
 
-[//]: # ()
-[//]: # (&#40;1&#41; Clone the repository to your workspace.)
+# 2. Getting Started
 
-[//]: # ()
-[//]: # (```shell)
 
-[//]: # (~ $ git clone https://github.com/EnzeXu/CSCI680_N_Gram.git)
+This project is developed using Python 3.9+ and is compatible with macOS or Linux
 
-[//]: # (```)
 
-[//]: # ()
-[//]: # (&#40;2&#41; Navigate into the repository.)
+## 2.1 Preparations
 
-[//]: # (```shell)
 
-[//]: # (~ $ cd CSCI680_N_Gram)
+(1) Clone the repository to your workspace.
 
-[//]: # (~/CSCI680_N_Gram $)
 
-[//]: # (```)
+```shell
 
-[//]: # ()
-[//]: # (&#40;3&#41; Create a new virtual environment and activate it. In this case we use Virtualenv environment &#40;Here we assume you have installed the `virtualenv` package using you source python script&#41;, you can use other virtual environments instead &#40;like conda&#41;.)
+~ $ git clone https://github.com/EnzeXu/CSCI680_If_Statement.git
 
-[//]: # ()
-[//]: # (For macOS or Linux operating systems:)
+```
 
-[//]: # (```shell)
 
-[//]: # (~/CSCI680_N_Gram $ python -m venv ./venv/)
+(2) Navigate into the repository.
 
-[//]: # (~/CSCI680_N_Gram $ source venv/bin/activate)
+```shell
 
-[//]: # (&#40;venv&#41; ~/CSCI680_N_Gram $ )
+~ $ cd CSCI680_If_Statement
 
-[//]: # (```)
+~/CSCI680_If_Statement $
 
-[//]: # ()
-[//]: # (For Windows operating systems:)
+```
 
-[//]: # ()
-[//]: # (```shell)
 
-[//]: # (~/CSCI680_N_Gram $ python -m venv ./venv/)
+(3) Create a new virtual environment and activate it. In this case we use Virtualenv environment (Here we assume you have installed the `virtualenv` package using you source python script), you can use other virtual environments instead (like conda).
 
-[//]: # (~/CSCI680_N_Gram $ .\venv\Scripts\activate)
 
-[//]: # (&#40;venv&#41; ~/CSCI680_N_Gram $ )
+For macOS or Linux operating systems:
 
-[//]: # (```)
+```shell
 
-[//]: # ()
-[//]: # (You can use the command deactivate to exit the virtual environment at any time.)
+~/CSCI680_If_Statement $ python -m venv ./venv/
 
-[//]: # ()
-[//]: # (## 2.2 Install Packages)
+~/CSCI680_If_Statement $ source venv/bin/activate
 
-[//]: # ()
-[//]: # (```shell)
+(venv) ~/CSCI680_If_Statement $ 
 
-[//]: # (&#40;venv&#41; ~/CSCI680_N_Gram $ pip install -r requirements.txt)
+```
 
-[//]: # (```)
 
-[//]: # ()
-[//]: # (## 2.3 Run N-gram)
+For Windows operating systems:
 
-[//]: # ()
-[//]: # (&#40;1&#41; Run N-gram demo)
 
-[//]: # ()
-[//]: # (The N-gram demo script will utilize 250 classes for the training set and 100 classes for the test set. The hyperparameter values will range from 2 to 10.)
+```shell
 
-[//]: # ()
-[//]: # (```shell)
+~/CSCI680_If_Statement $ python -m venv ./venv/
 
-[//]: # (&#40;venv&#41; ~/CSCI680_N_Gram $ python run_demo.py)
+~/CSCI680_If_Statement $ .\venv\Scripts\activate
 
-[//]: # (```)
+(venv) ~/CSCI680_If_Statement $ 
 
-[//]: # ()
-[//]: # (&#40;2&#41; Run N-gram complete)
+```
 
-[//]: # ()
-[//]: # (The N-gram complete script will utilize 125 / 250 / 500 / 1,000 / 2,000 / 4,000 / 8,000 / 16,000 classes for the training set and 100 classes for the test set. The hyperparameter values will range from 2 to 10. This experiment setting is the same as the results introduced in the final report.)
 
-[//]: # ()
-[//]: # (```shell)
+You can use the command deactivate to exit the virtual environment at any time.
 
-[//]: # (&#40;venv&#41; ~/CSCI680_N_Gram $ python run_complete.py)
 
-[//]: # (```)
+## 2.2 Install Packages
 
-[//]: # ()
-[//]: # ()
-[//]: # ()
-[//]: # (&#40;3&#41; Collect the results from `logs.txt`.)
 
-[//]: # ()
-[//]: # (```shell)
+```shell
 
-[//]: # (&#40;venv&#41; ~/CSCI680_N_Gram $ cat logs.txt)
+(venv) ~/CSCI680_If_Statement $ pip install -r requirements.txt
 
-[//]: # (```)
+```
 
-[//]: # ()
-[//]: # (An example log result for the N-gram demo script is as follows:)
+## 2.3 Dataset and data preprocessing
 
-[//]: # (```text)
+You may download our full source dataset `full_dataset.csv` from [[OneDrive]](https://wmedu-my.sharepoint.com/:f:/g/personal/exu03_wm_edu/EgkSjqpbkqBAj1lqMXTdnF8BC3cHu9BN2DfHlh1yZquhng?e=xd8Lsd).
 
-[//]: # (timestring,train_num,N,task_success_count,task_num,precision)
+Please copy `full_dataset.csv` under directory `./src/`.
 
-[//]: # (20240926_010819_573420,250,2,16496,73566,0.2242340211510752)
+To preprocessing our dataset into the pretrain & train format:
 
-[//]: # (20240926_010821_567154,250,3,18965,73566,0.2577957208493054)
+```shell
 
-[//]: # (20240926_010822_525474,250,4,16171,73566,0.21981621944920207)
+(venv) ~/CSCI680_If_Statement $ python ifstatement/model/make_dataset_pretrain.py
+(venv) ~/CSCI680_If_Statement $ python ifstatement/model/make_dataset_train.py
 
-[//]: # (20240926_010823_264350,250,5,12582,73566,0.17103009542451675)
+```
 
-[//]: # (20240926_010823_928997,250,6,9878,73566,0.13427398526493217)
+These steps will automatically read `./src/full_dataset.csv` and generate `./src/full_dataset_train.pkl` and `./src/full_dataset_pretrain.pkl`.
 
-[//]: # (20240926_010824_587305,250,7,8370,73566,0.11377538536824076)
+Alternatively, you may also directly download them via [[OneDrive]](https://wmedu-my.sharepoint.com/:f:/g/personal/exu03_wm_edu/EgkSjqpbkqBAj1lqMXTdnF8BC3cHu9BN2DfHlh1yZquhng?e=xd8Lsd).
 
-[//]: # (20240926_010825_257572,250,8,7236,73566,0.09836065573770492)
+In this way, please make sure they are copied to directory `./src/`.
 
-[//]: # (20240926_010825_934722,250,9,6414,73566,0.0871870157409673)
+## 2.4 Run Pretraining
 
-[//]: # (20240926_010826_613846,250,10,5891,73566,0.08007775330995297)
 
-[//]: # (```)
+```shell
 
-[//]: # ()
-[//]: # (# 3. Report)
+(venv) ~/CSCI680_If_Statement $ python run_pretrain.py
 
-[//]: # ()
-[//]: # (The assignment report is available in the attached file Assignment_Report_Enze_and_Yi.pdf.)
+```
 
-[//]: # ()
-[//]: # ()
-[//]: # (# 4. Questions)
+## 2.5 Run training
 
-[//]: # ()
-[//]: # (If you have any questions, please contact xezpku@gmail.com.)
 
-[//]: # ()
-[//]: # ()
+```shell
+
+(venv) ~/CSCI680_If_Statement $ python run_train.py
+
+```
+
+## 2.6 Evaluate a CSV File Using the Trained Model Weight
+
+Please download the formatted cleaned test dataset `test_dataset.csv` and `sample.csv` from [[OneDrive]](https://wmedu-my.sharepoint.com/:f:/g/personal/exu03_wm_edu/EgkSjqpbkqBAj1lqMXTdnF8BC3cHu9BN2DfHlh1yZquhng?e=xd8Lsd).
+
+Please save them under `./result/`.
+
+The following script will read `./result/test_dataset.csv` and save the result csv into `./result/test_dataset_prediction.csv`.
+
+```shell
+
+(venv) ~/CSCI680_If_Statement $ python predict_dataset.py
+
+```
+
+You may also modify its input to `./result/sample.csv` in the main function.
+
+# 3. Report
+
+
+The assignment report is available in the attached file [Assignment_Report_Enze_and_Yi.pdf](Assignment_Report_Enze_and_Yi.pdf).
+
+
+
+# 4. Questions
+
+
+If you have any questions, please contact xezpku@gmail.com.
+
+
+
