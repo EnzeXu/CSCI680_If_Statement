@@ -16,8 +16,12 @@ CSCI 680 AI for Software Engineering - If Statement
 ### Result CSV Files:
 These files are all available on [[OneDrive]](https://wmedu-my.sharepoint.com/:f:/g/personal/exu03_wm_edu/EgkSjqpbkqBAj1lqMXTdnF8BC3cHu9BN2DfHlh1yZquhng?e=xd8Lsd)
 1) `provided-testset.csv`: The prediction result of `sample.csv`.
-
 2) `generated-testset.csv`: The prediction result of `test_dataset.csv`.
+3) `sample.csv`: [129KB] - 30 entities.
+4) `test_dataset.csv`: [4.6MB] - 5K entities.
+5) `full_dataset.csv`: Complete dataset [281MB] - 148K entities.
+6) `full_dataset_pretrain.pkl`: Complete dataset for pretraining [116MB] - 148K entities.
+7) `full_dataset_train.pkl`: Complete dataset for training [45MB] - 50K entities.
 ---
 
 ### Quick screenshot of `generated-testset.csv`.
