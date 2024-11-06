@@ -1,4 +1,4 @@
-
+import time
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -51,8 +51,12 @@ class MaskPredictorModel(nn.Module):
 
         self.model.train()
 
+        t0 = time.time()
+        t_tmp = t0
+        t1 = t0
         for epoch in range(epochs):
             # print(f"Epoch {epoch + 1}/{epochs}")
+            # t_tmp = time.time()
             total_loss = 0
             precision_val = 0.0
             precision_cnt = 0
@@ -124,12 +128,19 @@ class MaskPredictorModel(nn.Module):
                 optimizer.zero_grad()
 
                 total_loss += loss.item()
+            t_tmp = time.time()
+            time_cost = t_tmp - t1
+            time_total = t_tmp - t0
+            time_remain = time_total / (epoch + 1) * (epochs - epoch - 1)
 
-            print(f"[Epoch {epoch + 1}/{epochs}] Loss: {total_loss / len(data_loader)} lr: {optimizer.param_groups[0]['lr']:.9f} precision: {precision_val/precision_cnt:.8f}")
-            print("=" * 200)
-            print(f"Pred [{len(batch_prediction_list)}]: {batch_prediction_list}")
-            print(f"True [{len(batch_truth_list)}]: {batch_truth_list}")
-            print("=" * 200)
+            print(f"[Epoch {epoch + 1:04d}/{epochs:04d}] Loss: {total_loss / len(data_loader):.6f} "
+                  f"lr: {optimizer.param_groups[0]['lr']:.6f} precision: {precision_val/precision_cnt:.6f} "
+                  f"(t_cost: {time_cost/60:.2f} min, t_total: {time_total/60:.2f} min, t_remain: {time_remain/60:.2f} min)")
+            t1 = t_tmp
+            # print("=" * 200)
+            # print(f"Pred [{len(batch_prediction_list)}]: {batch_prediction_list}")
+            # print(f"True [{len(batch_truth_list)}]: {batch_truth_list}")
+            # print("=" * 200)
 
 
 # Define custom dataset
